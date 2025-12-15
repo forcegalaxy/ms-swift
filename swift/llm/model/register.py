@@ -731,6 +731,11 @@ def get_model_tokenizer(
         num_labels: Optional[int] = None,
         return_dummy_model: bool = False,
         model_kwargs: Optional[Dict[str, Any]] = None,
+        # Science vocabulary extension
+        use_extended_vocab: bool = False,
+        science_tokenizer_path: Optional[str] = None,
+        vocab_init_method: str = 'mean',
+        resize_on_cpu: bool = True,
         **kwargs) -> Tuple[Optional[PreTrainedModel], PreTrainedTokenizerBase]:
     """
     model_id_or_path: The path to the model or the model_id from modelscope/huggingface (controlled by `use_hf`).
@@ -801,6 +806,47 @@ def get_model_tokenizer(
                     llm_model.resize_token_embeddings(vocab_size)
                     # fix transformers==4.52.4 qwen2.5-vl
                     HfConfigFactory.set_config_attr(llm_model.config, 'vocab_size', vocab_size)
+
+    # Science vocabulary extension
+    if use_extended_vocab:
+        try:
+            from .science_tokenizer import (
+                load_science_tokenizer,
+                extend_model_embeddings
+            )
+
+            # Record original vocabulary size
+            old_vocab_size = len(tokenizer)
+
+            # Load science tokenizer
+            logger.info(f'Loading extended science vocabulary...')
+            tokenizer = load_science_tokenizer(science_tokenizer_path)
+            new_vocab_size = len(tokenizer)
+
+            logger.info(f'Vocabulary extended: {old_vocab_size} -> {new_vocab_size} '
+                       f'(+{new_vocab_size - old_vocab_size} tokens)')
+
+            # Extend model embeddings if model is loaded
+            if model is not None and not return_dummy_model:
+                llm_model = get_lm_head_model(model, model_meta)
+                extend_model_embeddings(
+                    llm_model,
+                    old_vocab_size,
+                    new_vocab_size,
+                    init_method=vocab_init_method,
+                    resize_on_cpu=resize_on_cpu
+                )
+
+            # Update processor if needed
+            if processor != tokenizer:
+                if hasattr(processor, 'tokenizer'):
+                    processor.tokenizer = tokenizer
+                else:
+                    processor = tokenizer
+
+        except Exception as e:
+            logger.error(f'Failed to extend vocabulary: {e}')
+            logger.warning('Continuing with original vocabulary...')
 
     tokenizer.model_info = model_info
     tokenizer.model_meta = model_meta

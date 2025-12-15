@@ -89,6 +89,16 @@ class ModelArguments:
     init_strategy: Literal['zero', 'uniform', 'normal', 'xavier_uniform', 'xavier_normal', 'kaiming_uniform',
                            'kaiming_normal', 'orthogonal'] = None
 
+    # Science vocabulary extension support
+    use_extended_vocab: bool = field(
+        default=False, metadata={'help': 'Whether to use extended science vocabulary for models like Qwen'})
+    science_tokenizer_path: Optional[str] = field(
+        default=None, metadata={'help': 'Path to the science tokenizer. Defaults to qwen3_tokenizer/qwen3'})
+    vocab_init_method: Literal['mean', 'nearest', 'random'] = field(
+        default='mean', metadata={'help': 'Initialization method for new token embeddings'})
+    resize_on_cpu: bool = field(
+        default=True, metadata={'help': 'Whether to resize token embeddings on CPU to avoid OOM'})
+
     def _init_device_map(self):
         """Prepare device map args"""
         if self.device_map:
@@ -236,4 +246,9 @@ class ModelArguments:
             'num_labels': self.num_labels,
             'problem_type': self.problem_type,
             'init_strategy': self.init_strategy,
+            # Science vocabulary extension
+            'use_extended_vocab': self.use_extended_vocab,
+            'science_tokenizer_path': self.science_tokenizer_path,
+            'vocab_init_method': self.vocab_init_method,
+            'resize_on_cpu': self.resize_on_cpu,
         }
