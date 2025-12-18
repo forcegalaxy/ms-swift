@@ -1,5 +1,5 @@
 #!/bin/bash
-
+export PYTHONPATH="/nfs-13/wuxiaoyu/科学Omni/Sequence_tokenizer/msswift:$PYTHONPATH"
 # 默认值
 MODEL=""
 DATASET=""
@@ -113,6 +113,6 @@ fi
 #     "${CMD[@]}"
 
 # 使用 env 设置环境变量并执行命令
-env NPROC_PER_NODE=8 \
-    CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 \
+env NPROC_PER_NODE=7 \
+    CUDA_VISIBLE_DEVICES=1,2,3,4,5,6,7 \
     "${CMD[@]}"

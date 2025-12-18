@@ -15,12 +15,12 @@ TEMPLATE_SCRIPT="${SCRIPT_DIR}/train_template.sh"
 # 定义多个训练任务的参数（每个任务是一个参数字符串 + 任务名）
 # 格式：任务名|参数字符串
 declare -a TRAIN_TASKS=(        
-    "S1_Omni_vocabextension_chem_test|--model /nfs-13/wuxiaoyu/model_train/model/Qwen3-1.7B \
+    "S1_Omni_vocabextension_chem_test|--model /nfs-13/wuxiaoyu/model_train/model/Qwen3-8B \
      --dataset /nfs-13/wuxiaoyu/model_train/ms-swift/my_train_scripts/Annealing_5338_DS.jsonl \
      --num_train_epochs 7 \
      --learning_rate 5e-6 \
      --max_length 4096 \
-     --output_dir /nfs-13/wuxiaoyu/科学Omni/Sequence_tokenizer/model_output/S1_Omni_vocabextension_chem_test \
+     --output_dir /nfs-13/wuxiaoyu/科学Omni/Sequence_tokenizer/msswift/output/model/S1_Omni_vocabextension_chem_test \
      --swanlab_project S1-Omni-vocabextension-msswift \
      --swanlab_exp_name S1_Omni_vocabextension_chem_test"
 
